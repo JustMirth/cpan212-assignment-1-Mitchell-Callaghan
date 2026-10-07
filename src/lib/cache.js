@@ -1,4 +1,4 @@
-import {config} from '../config.js';
+import { config } from '../config.js';
 
 // TODO (you): an in-memory cache where each entry expires after a set time.
 // It needs a way to get a value (counting a hit or a miss), store a value,
@@ -18,7 +18,7 @@ export function get(key) {
         return undefined;
     }
 
-    if (Date.now() > entry.expiresAt) {
+    if (Date.now() >= entry.expiresAt) {
         cache.delete(key);
         misses++;
         return undefined;
@@ -31,7 +31,7 @@ export function get(key) {
 export function set(key, value) {
     cache.set(key, {
         value,
-        expiresAt: Date.now() + config.cache.ttlSeconds * 1000,
+        expiresAt: Date.now() + config.cacheTtlSeconds * 1000,
     });
 }
 
@@ -39,7 +39,7 @@ export function getStats() {
     const now = Date.now();
     
     for (const [key, entry] of cache.entries()) {
-        if (now > entry.expiresAt) {
+        if (now >= entry.expiresAt) {
             cache.delete(key);
         }
     }
@@ -48,6 +48,6 @@ export function getStats() {
         entries: cache.size,
         hits,
         misses,
-        ttlSeconds: config.cache.ttlSeconds,
+        ttlSeconds: config.cacheTtlSeconds,
     };
 }
