@@ -1,6 +1,7 @@
 import { config } from '../config.js';
 import { geocodeCity, getForecast } from './open-meteo.js';
 import { describeWeatherCode } from './weather-codes.js';
+import { get, set, getStats } from './cache.js';
 
 // TODO (you): create one cache for the whole app, with a time to live of
 // config.cacheTtlSeconds.
@@ -10,6 +11,12 @@ import { describeWeatherCode } from './weather-codes.js';
 // the forecast, build the summary, store it, and return it with cached: false.
 // On a hit, return the stored summary with cached: true.
 export async function getCityWeather(city) {
+  const key = city.trim().toLowerCase();
+  const cachedWeather = get(key);
+  if (cachedWeather) {
+    return { ...cachedWeather, cached: true };
+  }
+
   const location = await geocodeCity(city);
   const forecast = await getForecast(location.latitude, location.longitude);
 
@@ -48,6 +55,7 @@ export async function getCityWeather(city) {
     cached: false
   };
 
+  set(key, weather);
   return weather;
 }
 
