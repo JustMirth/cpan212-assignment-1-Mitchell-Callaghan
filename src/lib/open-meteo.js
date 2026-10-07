@@ -71,8 +71,8 @@ export async function getForecast(latitude, longitude) {
   const url = new URL(`${config.forecastUrl}/forecast`);
   url.searchParams.set('latitude', latitude);
   url.searchParams.set('longitude', longitude);
-  url.searchParams.set('current','temperature_2m_max,temperature_2m_min,weathercode');
-  url.searchParams.set('daily','weathercode,temperature_2m_max,temperature_2m_min');
+  url.searchParams.set('current','temperature_2m,apparent_temperature,relativehumidity_2m,windspeed_10m,weathercode');
+  url.searchParams.set('daily','temperature_2m_min,temperature_2m_max,precipitation_probability_max,weathercode');
   url.searchParams.set('timezone', 'auto');
   url.searchParams.set('forecast_days', '3');
 

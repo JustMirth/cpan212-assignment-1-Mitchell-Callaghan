@@ -10,7 +10,45 @@ import { describeWeatherCode } from './weather-codes.js';
 // the forecast, build the summary, store it, and return it with cached: false.
 // On a hit, return the stored summary with cached: true.
 export async function getCityWeather(city) {
-  throw new Error('getCityWeather is not written yet');
+  const location = await geocodeCity(city);
+  const forecast = await getForecast(location.latitude, location.longitude);
+
+  const { current, daily } = forecast;
+  
+  const weather = {
+    location: {
+      name: location.name,
+      region: location.region,
+      country: location.country,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timezone: location.timezone
+    },
+
+    current: {
+      time: current.time,
+      temperatureC: current.temperature_2m,
+      feelsLikeC: current.apparent_temperature,
+      humidityPercent: current.relativehumidity_2m,
+      windKmh: current.windspeed_10m,
+      weatherCode: current.weathercode,
+      condition: describeWeatherCode(current.weathercode)
+    },
+    
+    daily: daily.time.map((date, index) => ({
+      date,
+      minC: daily.temperature_2m_min[index],
+      maxC: daily.temperature_2m_max[index],
+      precipitationChancePercent: daily.precipitation_probability_max[index] ?? null,
+      weatherCode: daily.weathercode[index],
+      condition: describeWeatherCode(daily.weathercode[index])
+    })),
+    
+    fetchedAt: new Date().toISOString(),
+    cached: false
+  };
+
+  return weather;
 }
 
 // TODO (you): return the cache statistics for GET /api/cache/stats.
